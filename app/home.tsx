@@ -11,6 +11,7 @@ import { useRouter, useFocusEffect, Redirect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useState } from "react";
 import { useAuth } from "../src/hooks/useAuth";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 type Device = {
   id: string;
@@ -89,6 +90,38 @@ export default function Home() {
     }
   };
 
+    const getDeviceIcon = (type: string) => {
+    switch (type) {
+      case "Phone":
+        return <Ionicons name="phone-portrait-outline" size={30} color="#000" />;
+      case "Tablet":
+        return <Ionicons name="tablet-portrait-outline" size={30} color="#000" />;
+      case "Laptop":
+        return <Ionicons name="laptop-outline" size={30} color="#000" />;
+      case "Desktop PC":
+        return <Ionicons name="desktop-outline" size={30} color="#000" />;
+      case "Smart Watch":
+        return <Ionicons name="watch-outline" size={30} color="#000" />;
+      case "Game Console":
+        return <Ionicons name="game-controller-outline" size={30} color="#000" />;
+      case "Router / MiFi":
+        return <MaterialCommunityIcons name="router-wireless" size={30} color="#000" />;
+      case "VR Headset":
+        return <MaterialCommunityIcons name="virtual-reality" size={30} color="#000" />;
+      case "Headphones / Earbuds":
+        return <Ionicons name="headset-outline" size={30} color="#000" />;
+      case "Power Bank":
+        return <MaterialCommunityIcons name="battery-charging-outline" size={30} color="#000" />;
+      case "External Hard Drive":
+        return <MaterialCommunityIcons name="harddisk" size={30} color="#000" />;
+      case "Flash Drive":
+        return <MaterialCommunityIcons name="usb-flash-drive" size={30} color="#000" />;
+      default:
+        return <Ionicons name="cube-outline" size={30} color="#000" />;
+    }
+  };
+
+
   if (loading) return null;
   if (!user) return <Redirect href="/" />;
 
@@ -132,11 +165,14 @@ export default function Home() {
           </Text>
 
           {devices.length === 0 ? (
-            <Text style={styles.empty}>No devices yet. Add one.</Text>
+            <Text style={styles.empty}>No devices yet.</Text>
           ) : (
             <View style={styles.listWrap}>
               {devices.map((d) => (
                 <View key={d.id} style={styles.deviceRow}>
+                 <View style={styles.iconWrap}>
+                    {getDeviceIcon(d.deviceType)}
+                  </View>
                   <TouchableOpacity
                     activeOpacity={0.85}
                     style={styles.deviceMain}
@@ -146,28 +182,29 @@ export default function Home() {
                     <Text style={styles.deviceName}>{d.deviceName}</Text>
                   </TouchableOpacity>
 
-                  <View style={styles.actions}>
-                    <TouchableOpacity
-                      activeOpacity={0.85}
-                      style={styles.editBtn}
-                      onPress={() =>
-                        router.push({
-                          pathname: "/devices",
-                          params: { edit: d.id },
-                        })
-                      }
-                    >
-                      <Text style={styles.editText}>Edit</Text>
-                    </TouchableOpacity>
+          <View style={styles.actions}>
+  <TouchableOpacity
+    activeOpacity={0.85}
+    style={styles.iconBtn}
+    onPress={() =>
+      router.push({
+        pathname: "/devices",
+        params: { edit: d.id },
+      })
+    }
+  >
+    <Ionicons name="pencil-outline" size={18} color="#000" />
+  </TouchableOpacity>
 
-                    <TouchableOpacity
-                      activeOpacity={0.85}
-                      style={styles.deleteBtn}
-                      onPress={() => deleteDevice(d.id)}
-                    >
-                      <Text style={styles.deleteText}>Del</Text>
-                    </TouchableOpacity>
-                  </View>
+  <TouchableOpacity
+    activeOpacity={0.85}
+    style={styles.iconBtn}
+    onPress={() => deleteDevice(d.id)}
+  >
+    <Ionicons name="trash-outline" size={18} color="#d11a2a" />
+  </TouchableOpacity>
+</View>
+
                 </View>
               ))}
             </View>
@@ -182,7 +219,7 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#fff" },
   content: { padding: 20, paddingTop: 20, gap: 16 },
 
-  welcome: { color: "#0F0F16", fontSize: 30, fontWeight: "600" },
+  welcome: { color: "#0F0F16", fontSize: 26, fontWeight: "800" },
 
   threeCards: { flexDirection: "row", gap: 10 },
 
@@ -246,6 +283,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
+   iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+
   deviceMain: { flex: 1, paddingRight: 12 },
 
   deviceType: { color: "#020202", fontWeight: "600", fontSize: 18 },
@@ -254,21 +301,13 @@ const styles = StyleSheet.create({
 
   actions: { flexDirection: "row", gap: 8 },
 
-  editBtn: {
-    backgroundColor: "#12121A",
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-  },
+  iconBtn: {
+  width: 36,
+  height: 36,
+  borderRadius: 10,
+  backgroundColor: "#f4f4f4",
+  justifyContent: "center",
+  alignItems: "center",
+},
 
-  editText: { color: "#fff", fontWeight: "800", fontSize: 12 },
-
-  deleteBtn: {
-    backgroundColor: "#1F0000",
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-  },
-
-  deleteText: { color: "#ff4d4d", fontWeight: "800", fontSize: 12 },
 });

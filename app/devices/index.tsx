@@ -185,7 +185,7 @@ export default function DevicesPage() {
   return (
     <View style={styles.page}>
       <Text style={styles.h1}>Devices</Text>
-      <Text style={styles.sub}>This page hosts Add or Edit Device modal.</Text>
+      <Text style={styles.sub}>Enter device Details</Text>
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={closeModal}>
         <View style={styles.modalOverlay}>
@@ -320,44 +320,43 @@ const styles = StyleSheet.create({
   modalTitle: { color: "#0F0F16", fontSize: 26, fontWeight: "600" },
 
   input: {
-    backgroundColor: "#0F0F16",
+    backgroundColor: "#fff",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    color: "#fff",
+    color: "#000",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
+    borderColor: "#000",
   },
 
-  // ✅ Dropdown field
   select: {
-    backgroundColor: "#0F0F16",
+    backgroundColor: "#fff",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 14,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
+    borderColor: "#000",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   selectPlaceholder: { color: "#777", fontWeight: "700" },
-  selectText: { color: "#fff", fontWeight: "800" },
+  selectText: { color: "#000", fontWeight: "800" },
   chev: { color: "#A1A1AA", fontSize: 20, fontWeight: "900" },
 
   add: { backgroundColor: "#000", borderRadius: 12, paddingVertical: 14, alignItems: "center", marginTop: 4 },
-  addText: { color: "#fff", fontWeight: "800" },
+  addText: { color: "#fff", fontWeight: "600" },
 
   cancel: {
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: "rgba(73, 65, 65, 0.36)",
   },
-  cancelText: { color: "#A1A1AA", fontWeight: "800" },
+  cancelText: { color: "#000", fontWeight: "800" },
 
-  // ✅ Picker modal
+
   pickerOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.7)",
@@ -365,7 +364,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   pickerCard: {
-    backgroundColor: "#12121A",
+    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -373,19 +372,19 @@ const styles = StyleSheet.create({
     maxHeight: "80%",
     gap: 12,
   },
-  pickerTitle: { color: "#fff", fontSize: 16, fontWeight: "900" },
+  pickerTitle: { color: "#000", fontSize: 20, fontWeight: "600" },
   pickerItem: {
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.10)",
-    backgroundColor: "#0F0F16",
+    backgroundColor: "#fff",
   },
   pickerItemActive: {
     borderColor: "rgba(154, 201, 164, 0.8)",
   },
-  pickerItemText: { color: "#fff", fontWeight: "800" },
+  pickerItemText: { color: "#000", fontWeight: "800" },
   pickerItemTextActive: { color: "#9ac9a4ff" },
 
   pickerCancel: {
@@ -393,7 +392,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: "000(255,255,255,0.12)",
   },
-  pickerCancelText: { color: "#A1A1AA", fontWeight: "800" },
+  pickerCancelText: { color: "#000", fontWeight: "800" },
 });
