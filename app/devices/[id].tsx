@@ -8,9 +8,12 @@ type Device = {
   deviceType: string;
   brand: string;
   serialNumber: string;
-  imei?: string; // ✅ optional
+  imei?: string;
   deviceName: string;
   createdAt: number;
+  Warranty: string;
+  Model: string;
+  Info: string;
 };
 
 const STORAGE_KEY = "devices";
@@ -46,29 +49,66 @@ export default function DeviceDetails() {
         <Row label="Brand" value={device.brand} />
         <Row label="Serial Number" value={device.serialNumber} />
         {device.imei ? <Row label="IMEI" value={device.imei} /> : null}
+        <Row label="Warranty Coverage" value={device.Warranty} />
+        <Row label="Device Model" value={device.Model} />
+        <Row label="Device Information" value={device.Info} />
       </View>
+      
     </View>
   );
 }
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <View style={{ gap: 4, marginBottom: 14 }}>
-      <Text style={{ color: "#A1A1AA", fontSize: 12 }}>{label}</Text>
-      <Text style={{ color: "#fff", fontSize: 16, fontWeight: "800" }}>{value}</Text>
+    <View style={styles.row}>
+      <View style={styles.labelCol}>
+        <Text style={styles.rowLabel}>{label}:</Text>
+      </View>
+
+      <View style={styles.valueCol}>
+        <Text style={styles.rowValue}>{value}</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: "#0B0B0F", padding: 16, paddingTop: 50 },
-  h1: { color: "#fff", fontSize: 26, fontWeight: "800", marginBottom: 12 },
+  page: { flex: 1, backgroundColor: "#fff", padding: 16, paddingTop: 50 },
+  h1: { color: "#000", fontSize: 30, fontWeight: "700", marginBottom: 12 },
   muted: { color: "#A1A1AA" },
+
   card: {
-    backgroundColor: "#12121A",
+    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderColor: "rgba(187, 178, 178, 0.4)",
+  },
+
+  row: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 14,
+  },
+
+  labelCol: {
+    width: 180, 
+  },
+
+  rowLabel: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  valueCol: {
+    flex: 1,
+  },
+
+  rowValue: {
+    color: "#6b6b6b",
+    fontSize: 16,
+    fontWeight: "600",
+    lineHeight: 20,
   },
 });
