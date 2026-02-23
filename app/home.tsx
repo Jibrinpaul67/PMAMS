@@ -6,12 +6,15 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Linking,
+  ImageBackground,
 } from "react-native";
 import { useRouter, useFocusEffect, Redirect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useState } from "react";
 import { useAuth } from "../src/hooks/useAuth";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { logoutUser } from "../src/services/auth"; // ✅ added (adjust path if needed)
 
 type Device = {
   id: string;
@@ -30,6 +33,7 @@ export default function Home() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [devices, setDevices] = useState<Device[]>([]);
+  const [menuOpen, setMenuOpen] = useState(false); 
 
   const loadDevices = useCallback(async () => {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -43,6 +47,25 @@ export default function Home() {
       loadDevices();
     }, [loadDevices])
   );
+
+  const openLink = async (url: string) => {
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert("Error", "Cannot open this link");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setMenuOpen(false);
+      await logoutUser(); // ✅ firebase signOut
+      router.replace("/"); // ✅ back to login
+    } catch (error: any) {
+      Alert.alert("Logout failed", error?.message || "Something went wrong");
+    }
+  };
 
   const isFull = devices.length >= MAX_DEVICES;
 
@@ -72,9 +95,7 @@ export default function Home() {
 
   const deleteDevice = (id: string) => {
     if (Platform.OS === "web") {
-      const confirmDelete = window.confirm(
-        "You sure you want to delete this device?"
-      );
+      const confirmDelete = window.confirm("You sure you want to delete this device?");
       if (confirmDelete) {
         doDelete(id);
       }
@@ -90,37 +111,38 @@ export default function Home() {
     }
   };
 
-    const getDeviceIcon = (type: string) => {
+  const getDeviceIcon = (type: string) => {
     switch (type) {
       case "Phone":
-        return <Ionicons name="phone-portrait-outline" size={30} color="#000" />;
+        return <Ionicons name="phone-portrait-outline" size={30} color="#20326e" />;
       case "Tablet":
-        return <Ionicons name="tablet-portrait-outline" size={30} color="#000" />;
+        return <Ionicons name="tablet-portrait-outline" size={30} color="#20326e" />;
       case "Laptop":
-        return <Ionicons name="laptop-outline" size={30} color="#000" />;
+        return <Ionicons name="laptop-outline" size={30} color="#20326e" />;
       case "Desktop PC":
-        return <Ionicons name="desktop-outline" size={30} color="#000" />;
+        return <Ionicons name="desktop-outline" size={30} color="#20326e" />;
       case "Smart Watch":
-        return <Ionicons name="watch-outline" size={30} color="#000" />;
+        return <Ionicons name="watch-outline" size={30} color="#20326e" />;
       case "Game Console":
-        return <Ionicons name="game-controller-outline" size={30} color="#000" />;
+        return <Ionicons name="game-controller-outline" size={30} color="#20326e" />;
       case "Router / MiFi":
-        return <MaterialCommunityIcons name="router-wireless" size={30} color="#000" />;
+        return <MaterialCommunityIcons name="router-wireless" size={30} color="#20326e" />;
       case "VR Headset":
-        return <MaterialCommunityIcons name="virtual-reality" size={30} color="#000" />;
+        return <MaterialCommunityIcons name="virtual-reality" size={30} color="#20326e" />;
       case "Headphones / Earbuds":
-        return <Ionicons name="headset-outline" size={30} color="#000" />;
+        return <Ionicons name="headset-outline" size={30} color="#20326e" />;
       case "Power Bank":
-        return <MaterialCommunityIcons name="battery-charging-outline" size={30} color="#000" />;
+        return (
+          <MaterialCommunityIcons name="battery-charging-outline" size={30} color="#20326e" />
+        );
       case "External Hard Drive":
-        return <MaterialCommunityIcons name="harddisk" size={30} color="#000" />;
+        return <MaterialCommunityIcons name="harddisk" size={30} color="#20326e" />;
       case "Flash Drive":
-        return <MaterialCommunityIcons name="usb-flash-drive" size={30} color="#000" />;
+        return <MaterialCommunityIcons name="usb-flash-drive" size={30} color="#20326e" />;
       default:
-        return <Ionicons name="cube-outline" size={30} color="#000" />;
+        return <Ionicons name="cube-outline" size={30} color="#20326e" />;
     }
   };
-
 
   if (loading) return null;
   if (!user) return <Redirect href="/" />;
@@ -128,19 +150,80 @@ export default function Home() {
   return (
     <View style={styles.page}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.welcome}>Welcome {user.email}</Text>
+        {/* ✅ Welcome + top-right menu */}
+        <View style={styles.topRow}>
+          <Text style={styles.welcome}>Welcome {user.email}</Text>
+
+          <View style={styles.menuWrap}>
+            <TouchableOpacity
+              style={styles.menuBtn}
+              activeOpacity={0.85}
+              onPress={() => setMenuOpen((v) => !v)}
+            >
+              <Ionicons name="ellipsis-vertical" size={20} color="#0F0F16" />
+            </TouchableOpacity>
+
+            {menuOpen && (
+              <View style={styles.dropdown}>
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  activeOpacity={0.85}
+                  onPress={handleLogout}
+                >
+                  <Ionicons name="log-out-outline" size={18} color="#d11a2a" />
+                  <Text style={styles.dropdownText}>Logout</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
 
         {/* 3 black cards */}
         <View style={styles.threeCards}>
-          <View style={styles.blackCard}>
-            <Text style={styles.cardTitle}>Card 1</Text>
-          </View>
-          <View style={styles.blackCard}>
-            <Text style={styles.cardTitle}>Card 2</Text>
-          </View>
-          <View style={styles.blackCard}>
-            <Text style={styles.cardTitle}>Card 3</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.blackCard}
+            activeOpacity={0.85}
+            onPress={() =>
+              openLink(
+                "https://spyro-soft.com/blog/managed-services/what-is-software-maintenance-and-why-it-is-essential"
+              )
+            }
+          >
+            <ImageBackground
+              source={require("../asset/essential.png")}
+              style={styles.imageCard}
+              imageStyle={styles.imageRadius}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.blackCard}
+            activeOpacity={0.85}
+            onPress={() =>
+              openLink("https://flairstech.com/blog/software-maintenance-services-problems")
+            }
+          >
+            <ImageBackground
+              source={require("../asset/top5.png")}
+              style={styles.imageCard}
+              imageStyle={styles.imageRadius}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.blackCard}
+            activeOpacity={0.85}
+            onPress={() => openLink("https://arxiv.org/abs/2401.09275")}
+          >
+            <ImageBackground
+              source={require("../asset/hotfix.png")}
+              style={styles.imageCard}
+              imageStyle={styles.imageRadius}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Devices Section */}
@@ -170,9 +253,8 @@ export default function Home() {
             <View style={styles.listWrap}>
               {devices.map((d) => (
                 <View key={d.id} style={styles.deviceRow}>
-                 <View style={styles.iconWrap}>
-                    {getDeviceIcon(d.deviceType)}
-                  </View>
+                  <View style={styles.iconWrap}>{getDeviceIcon(d.deviceType)}</View>
+
                   <TouchableOpacity
                     activeOpacity={0.85}
                     style={styles.deviceMain}
@@ -182,35 +264,43 @@ export default function Home() {
                     <Text style={styles.deviceName}>{d.deviceName}</Text>
                   </TouchableOpacity>
 
-          <View style={styles.actions}>
-  <TouchableOpacity
-    activeOpacity={0.85}
-    style={styles.iconBtn}
-    onPress={() =>
-      router.push({
-        pathname: "/devices",
-        params: { edit: d.id },
-      })
-    }
-  >
-    <Ionicons name="pencil-outline" size={18} color="#000" />
-  </TouchableOpacity>
+                  <View style={styles.actions}>
+                    <TouchableOpacity
+                      activeOpacity={0.85}
+                      style={styles.iconBtn}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/devices",
+                          params: { edit: d.id },
+                        })
+                      }
+                    >
+                      <Ionicons name="pencil-outline" size={18} color="#000" />
+                    </TouchableOpacity>
 
-  <TouchableOpacity
-    activeOpacity={0.85}
-    style={styles.iconBtn}
-    onPress={() => deleteDevice(d.id)}
-  >
-    <Ionicons name="trash-outline" size={18} color="#d11a2a" />
-  </TouchableOpacity>
-</View>
-
+                    <TouchableOpacity
+                      activeOpacity={0.85}
+                      style={styles.iconBtn}
+                      onPress={() => deleteDevice(d.id)}
+                    >
+                      <Ionicons name="trash-outline" size={18} color="#d11a2a" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ))}
             </View>
           )}
         </View>
       </ScrollView>
+
+      {/* ✅ Tap anywhere outside the dropdown to close it */}
+      {menuOpen && (
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.backdrop}
+          onPress={() => setMenuOpen(false)}
+        />
+      )}
     </View>
   );
 }
@@ -219,20 +309,67 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#fff" },
   content: { padding: 20, paddingTop: 20, gap: 16 },
 
-  welcome: { color: "#0F0F16", fontSize: 26, fontWeight: "800" },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+
+  welcome: { color: "#333377", fontSize: 26, fontWeight: "800", flex: 1 },
+
+  menuWrap: { position: "relative" },
+
+  menuBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#f4f4f4",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  dropdown: {
+    position: "absolute",
+    top: 46,
+    right: 0,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.12)",
+    paddingVertical: 6,
+    minWidth: 140,
+    zIndex: 50,
+    elevation: 8,
+  },
+
+  dropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+
+  dropdownText: { fontSize: 14, fontWeight: "700", color: "#0F0F16" },
+
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
 
   threeCards: { flexDirection: "row", gap: 10 },
 
   blackCard: {
     flex: 1,
-    backgroundColor: "#000",
     borderRadius: 10,
-    padding: 20,
-    minHeight: 214,
-    justifyContent: "center",
+    overflow: "hidden",
+    borderWidth: 1.5,
+    borderColor: "rgba(0,0,0,0.85)",
   },
-
-  cardTitle: { color: "#fff", fontWeight: "800", fontSize: 14 },
 
   devicesBox: {
     backgroundColor: "#fff",
@@ -283,7 +420,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-   iconWrap: {
+  iconWrap: {
     width: 40,
     height: 40,
     borderRadius: 10,
@@ -302,12 +439,26 @@ const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: 8 },
 
   iconBtn: {
-  width: 36,
-  height: 36,
-  borderRadius: 10,
-  backgroundColor: "#f4f4f4",
-  justifyContent: "center",
-  alignItems: "center",
-},
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: "#f4f4f4",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
+  imageCard: {
+    width: "100%",
+    height: 214,
+    justifyContent: "flex-end",
+  },
+
+  imageRadius: {
+    borderRadius: 10,
+  },
 });
+
+
+
+
+
